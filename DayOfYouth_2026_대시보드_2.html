@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>청년 멘토링 2026 · The Day of Youth — 결과 대시보드</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+:root{
+  --ink:#16213E; --ink2:#2B3A5E; --paper:#FAF7F0; --card:#FFFFFF;
+  --amber:#F5B301; --coral:#E4572E; --teal:#2A9D8F; --line:#E8E2D6;
+  --tx:#1E2433; --tx2:#7A7568; --radius:14px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Pretendard Variable',Pretendard,-apple-system,sans-serif;background:var(--paper);color:var(--tx);padding:20px;font-size:14px}
+.wrap{max-width:1240px;margin:0 auto}
+.hdr{background:var(--ink);color:#fff;border-radius:var(--radius);padding:28px 32px;margin-bottom:18px;position:relative;overflow:hidden}
+.hdr::after{content:"HIGH FIVE";position:absolute;right:24px;bottom:-14px;font-size:64px;font-weight:900;letter-spacing:4px;color:rgba(245,179,1,.13)}
+.hdr .eyebrow{font-size:12px;letter-spacing:2.5px;color:var(--amber);font-weight:700;margin-bottom:8px}
+.hdr h1{font-size:26px;font-weight:800;letter-spacing:-0.5px}
+.hdr .sub{margin-top:8px;font-size:13px;color:rgba(255,255,255,.65)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:18px}
+.kpi{background:var(--card);border-radius:var(--radius);padding:18px 20px;border:1px solid var(--line)}
+.kpi .lab{font-size:11.5px;color:var(--tx2);letter-spacing:.8px;font-weight:600;text-transform:uppercase}
+.kpi .val{font-size:30px;font-weight:800;margin:4px 0 2px;letter-spacing:-1px}
+.kpi .note{font-size:12px;color:var(--tx2)}
+.kpi.warn{border-left:4px solid var(--coral)}
+.kpi.warn .val{color:var(--coral)}
+.kpi.gold{border-left:4px solid var(--amber)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:14px;margin-bottom:18px}
+.card{background:var(--card);border-radius:var(--radius);padding:20px 22px;border:1px solid var(--line)}
+.card h3{font-size:14px;font-weight:800;margin-bottom:4px;letter-spacing:-.2px}
+.card .cap{font-size:12px;color:var(--tx2);margin-bottom:14px;line-height:1.5}
+.card canvas{max-height:260px}
+.insight{background:#FFF8E4;border:1px solid #F0DFA0;border-radius:var(--radius);padding:18px 22px;margin-bottom:18px;font-size:13.5px;line-height:1.7}
+.insight b{color:var(--ink)}
+.insight .tag{display:inline-block;background:var(--ink);color:var(--amber);font-size:11px;font-weight:800;letter-spacing:1.5px;padding:3px 10px;border-radius:20px;margin-bottom:8px}
+.tbl-card{background:var(--card);border-radius:var(--radius);border:1px solid var(--line);padding:20px 22px;margin-bottom:18px}
+.tbl-head{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px;margin-bottom:14px}
+.tbl-head h3{font-size:16px;font-weight:800}
+.tbl-head .cnt{font-size:12.5px;color:var(--tx2);margin-top:3px}
+.filters{display:flex;gap:8px;flex-wrap:wrap}
+.filters select,.filters input{padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;font-size:12.5px;font-family:inherit;color:var(--tx)}
+.filters input{width:150px}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+thead th{text-align:left;padding:9px 10px;border-bottom:2px solid var(--ink);font-size:11px;letter-spacing:.6px;color:var(--tx2);text-transform:uppercase;white-space:nowrap;cursor:pointer;user-select:none}
+tbody td{padding:9px 10px;border-bottom:1px solid #F1EDE3;vertical-align:top}
+tbody tr:hover{background:#FBF8EF}
+.pill{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap}
+.pill.confirm{background:#E3F4E8;color:#1B7A3D}
+.pill.thinking{background:#EDEBF7;color:#5B4FB0}
+.pill.named{background:#FFF0C8;color:#8A6200}
+.pill.reco{background:#EAF3F2;color:#1F6E64}
+.pill.schol{background:#FDE8E0;color:#B23A16}
+.topic{color:#4A4536;max-width:420px;line-height:1.5}
+.mname{font-weight:700}
+.foot{font-size:11.5px;color:var(--tx2);text-align:center;padding:8px 0 24px;line-height:1.7}
+.tabs{display:flex;gap:8px;margin-bottom:18px}
+.tab-btn{padding:10px 22px;border-radius:10px;border:1px solid var(--line);background:var(--card);font-family:inherit;font-size:13.5px;font-weight:700;color:var(--tx2);cursor:pointer;letter-spacing:-.2px}
+.tab-btn.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+.tab-btn .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--amber);margin-right:7px;vertical-align:1px}
+.report{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:36px 40px;line-height:1.85;font-size:14px}
+.report h2{font-size:19px;font-weight:800;letter-spacing:-.4px;margin:36px 0 14px;padding-top:26px;border-top:2px solid var(--ink)}
+.report h2:first-child{margin-top:0;padding-top:0;border-top:none}
+.report h2 .num{color:var(--amber);margin-right:8px}
+.report .q{margin:18px 0 4px;font-weight:800;font-size:14px}
+.report .q .score{color:var(--ink);background:#F1EDE3;border-radius:6px;padding:1px 8px;font-size:12.5px;margin-left:6px}
+.report .ins{margin:2px 0 0 0;padding:10px 14px;background:#FBF8EF;border-left:3px solid var(--amber);border-radius:0 8px 8px 0;color:#4A4536;font-size:13.5px}
+.report .exec{background:#FFF8E4;border:1px solid #F0DFA0;border-radius:12px;padding:20px 24px;font-size:14px}
+.report ol{margin:10px 0 0 22px}
+.report ol li{margin-bottom:10px;padding-left:4px}
+.report ol li::marker{font-weight:800;color:var(--ink)}
+.report .hlabel{display:inline-block;background:var(--ink);color:var(--amber);font-size:11px;font-weight:800;padding:2px 8px;border-radius:5px;margin-right:8px;letter-spacing:.5px}
+.report b{color:var(--ink)}
+.report .sub-h{font-weight:800;font-size:14.5px;margin:20px 0 6px}
+@media print{.tabs{display:none}.tab-panel{display:block!important}}
+@media (max-width:768px){.report{padding:24px 20px}}
+@media (max-width:768px){.hdr h1{font-size:20px}.kpi .val{font-size:24px}.topic{max-width:none}}
+@media print{.filters{display:none}.card,.kpi{break-inside:avoid;box-shadow:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hdr">
+    <div class="eyebrow">POST-EVENT REPORT · 2026.07.04</div>
+    <h1>청년 멘토링 2026 · The Day of Youth</h1>
+    <div class="sub">설문 응답 121건(테스트 응답 제외) 기준 · 만족도 분석 + 1:1 멘토링 신청자 85명 매칭(안)</div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab-btn active" data-tab="dash"><span class="dot"></span>대시보드</button>
+    <button class="tab-btn" data-tab="report"><span class="dot"></span>분석 리포트</button>
+  </nav>
+
+  <div class="tab-panel" id="panel-dash">
+  <section class="kpis">
+    <div class="kpi"><div class="lab">전반 만족도</div><div class="val">4.55</div><div class="note">4점 이상 90.9%</div></div>
+    <div class="kpi"><div class="lab">추천 의향</div><div class="val">4.64</div><div class="note">5점 74% · 1~2점 0명</div></div>
+    <div class="kpi"><div class="lab">멘토 만족도</div><div class="val">4.62</div><div class="note">4점 이상 94.2%</div></div>
+    <div class="kpi warn"><div class="lab">조 매칭 적합도</div><div class="val">4.02</div><div class="note">1~2점 16명(13.2%) · 최대 리스크</div></div>
+    <div class="kpi gold"><div class="lab">1:1 잠재 수요</div><div class="val">85명</div><div class="note">확정 38 + 고민 중 47 (70.2%)</div></div>
+    <div class="kpi gold"><div class="lab">장학 트랙 관심</div><div class="val">33명</div><div class="note">전체의 27.3%</div></div>
+  </section>
+
+  <div class="insight">
+    <span class="tag">KEY INSIGHT</span><br>
+    행사의 가치 원천은 <b>2부 그룹 멘토링(76.9%)</b>이며, 멘토 품질(4.62)은 검증됐습니다. 유일한 구조적 약점은 <b>조 매칭(4.02)</b> — 매칭 점수와 전체 만족도의 상관계수는 <b>0.567</b>로, 매칭 실패자(1~2점)의 만족도는 3.75, 성공자는 4.76입니다. <b>매칭 프로세스 재설계가 차기 행사 만족도를 결정</b>합니다. 후속 자산: 1:1 잠재 수요 85명, 장학 관심 33명, 멘토 실명 지명 21건.
+  </div>
+
+  <section class="grid">
+    <div class="card"><h3>핵심 지표 점수 분포</h3><div class="cap">멘토 만족(Q7)과 조 매칭(Q8)의 0.6점 갭이 이번 행사의 핵심 과제</div><canvas id="cScores"></canvas></div>
+    <div class="card"><h3>가장 좋았던 순서</h3><div class="cap">그룹 멘토링이 압도적 — 시간·리소스 재배분 근거</div><canvas id="cBest"></canvas></div>
+    <div class="card"><h3>1:1 멘토링 희망 분야</h3><div class="cap">신청자 85명 기준 · 취업+커리어가 약 79%</div><canvas id="cFields"></canvas></div>
+    <div class="card"><h3>내년 희망 멘토 (산업·직무)</h3><div class="cap">유효 105건 분류 · IT/개발과 제조 엔지니어가 최대 공급 부족</div><canvas id="cNext"></canvas></div>
+    <div class="card"><h3>개선 요청 테마</h3><div class="cap">유효 62건 · 불만 3축(매칭·그룹운영·사전안내) 모두 운영 설계로 해결 가능</div><canvas id="cImprove"></canvas></div>
+    <div class="card"><h3>멘토별 배정 현황(안)</h3><div class="cap">지명 21건 + 분야 기반 추천 64건 · 부하 분산 반영</div><canvas id="cMentors"></canvas></div>
+  </section>
+
+  <section class="tbl-card">
+    <div class="tbl-head">
+      <div><h3>1:1 멘토링 신청자 매칭 리스트</h3><div class="cnt" id="cnt"></div></div>
+      <div class="filters">
+        <input type="text" id="fSearch" placeholder="이름·이메일·고민 검색">
+        <select id="fField"><option value="">분야 전체</option></select>
+        <select id="fStatus"><option value="">상태 전체</option><option>확정</option><option>고민 중</option></select>
+        <select id="fMentor"><option value="">멘토 전체</option></select>
+        <select id="fType"><option value="">매칭 전체</option><option>지명</option><option>추천</option></select>
+      </div>
+    </div>
+    <div style="overflow-x:auto">
+    <table>
+      <thead><tr><th data-k="name">이름</th><th data-k="phone">연락처</th><th data-k="status">상태</th><th data-k="field">분야</th><th>희망 멘토 · 고민</th><th data-k="scholarship">장학</th><th data-k="mentor">매칭 멘토(안)</th><th data-k="match_type">유형</th></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+    </div>
+  </section>
+
+  </div><!-- /panel-dash -->
+
+  <div class="tab-panel" id="panel-report" style="display:none">
+  <div class="report">
+    <h2><span class="num">1</span>항목별 통계 & 인사이트</h2>
+
+    <p class="q">Q4. 전반 만족도 <span class="score">평균 4.55 / 5</span></p>
+    <p>5점 80명(66%), 4점 30명, 3점 이하 11명 — 4점 이상 90.9%</p>
+    <p class="ins">첫 회 행사치고 매우 높은 수치. 다만 3점 이하 11명 중 다수가 Q8(조 매칭) 저점자와 겹침 — <b>불만의 원인이 단일함</b>.</p>
+
+    <p class="q">Q5. 추천 의향 <span class="score">평균 4.64 / 5</span></p>
+    <p>5점 89명(74%), 1~2점 0명</p>
+    <p class="ins">추천 의향이 만족도보다 높음 = "나는 아쉬웠어도 남에겐 추천"하는 구조. <b>오가닉 확산 잠재력 검증</b> — 다음 회차 모집은 참가자 추천 채널을 공식화할 가치가 있음.</p>
+
+    <p class="q">Q6. 가장 좋았던 순서</p>
+    <p>2부 그룹 멘토링 <b>93명(76.9%)</b> · 1부 강연 18명 · 1부 스토리텔링 7명 · 3부 네트워킹 3명</p>
+    <p class="ins">행사의 핵심 가치는 압도적으로 그룹 멘토링. 1부·3부는 사실상 서포트 콘텐츠. <b>시간 배분과 리소스를 2부에 재집중</b>해야 하며, 3부(3명)는 현재 포맷으론 존재 이유가 약함.</p>
+
+    <p class="q">Q7. 멘토 도움 정도 <span class="score">평균 4.62 / 5</span> &nbsp;·&nbsp; Q8. 조 매칭 적합도 <span class="score">평균 4.02 / 5</span></p>
+    <p>Q7: 4점 이상 94.2% / Q8: 4점 이상 69.4%, 1~2점 16명(13.2%)</p>
+    <p class="ins">멘토 품질(4.62)과 매칭 품질(4.02)의 <b>0.6점 갭이 이 행사의 최대 리스크</b>. Q8은 전체 만족도와 상관계수 0.567로 강하게 연동 — 매칭 실패자(Q8≤2)의 만족도는 3.75, 성공자(Q8≥4)는 4.76. <b>매칭이 곧 만족도</b>.</p>
+
+    <p class="q">Q9. 매칭 불만족자의 희망 분야 (23건)</p>
+    <p>건설·토목 4, IT·AI 4, 제조·기계·엔지니어 4, 영업·세일즈 3, 회계·재무 1 등. 그 외 "산업은 맞는데 직무가 안 맞음", "희망 분야를 명확히 적었는데 다른 조 배정", "조 내 연차 편차(학부연구생~5년차)로 대화가 겉돎" 등 <b>매칭 로직 자체에 대한 지적</b>이 구체적.</p>
+
+    <p class="q">Q10. 기억에 남는 조언 <span class="score">유효 119건 · 응답률 98%</span></p>
+    <p>최다 반복 테마: ① 자기이해("나를 알라") ② "같이 일하고 싶은 사람"·소프트스킬 ③ 조급해하지 마라 ④ 스토리텔링·셀프브랜딩 ⑤ AI 시대에도 변하지 않는 원리</p>
+    <p class="ins">참가자들이 실제로 콘텐츠를 흡수했다는 증거이자, 그대로 <b>다음 행사 홍보 카피·후기 콘텐츠 원천으로 쓸 수 있는 자산 119개</b>.</p>
+
+    <p class="q">Q11. 1:1 멘토링 신청</p>
+    <p>네 38명(31.4%) · 고민 중 47명(38.8%) · 아니오 36명</p>
+    <p class="ins">확정+고민 = <b>85명(70.2%)이 잠재 수요</b>. "고민 중" 47명이 최대 전환 풀이며 조 매칭 점수도 나쁘지 않음(평균 4.09). <b>행사 후 72시간 내 팔로업이 전환율을 좌우</b>.</p>
+
+    <p class="q">Q12. 희망 분야</p>
+    <p>취업 전략 47명(38.8%) &gt; 커리어 방향 38명(31.4%) &gt; 리더십·조직생활 12명 &gt; 창업·직무전환 각 6명</p>
+    <p class="ins">수요의 70%가 "취업+커리어 방향" — <b>타깃은 취준생·주니어</b>. Q16의 "신입 기준으로 운영해달라"는 요청과 일치.</p>
+
+    <p class="q">Q13. 희망 멘토 지명 <span class="score">유효 104건</span></p>
+    <p>실명 지명 다수: 윤의성(4회), 문희철(4회), 전미희·이주호(각 3회), 백종화, 김준수, 복석호, 우태욱 등. 황경하 지명 1건.</p>
+    <p class="ins"><b>멘토별 지명 수 = 멘토 퍼포먼스 지표</b>로 활용 가능. 지명받은 멘토 중심으로 1:1 트랙과 차기 행사 라인업 구성.</p>
+
+    <p class="q">Q14. 열정 장학생 후불 트랙 <span class="score">관심 33명 · 27.3%</span></p>
+    <p class="ins">1:1 "네" 응답자 38명 중 13명(34%)이 장학 트랙에도 관심, "아니오" 36명 중엔 3명만 관심 → 장학 트랙은 신규 수요 창출보다 <b>기존 의향자의 비용 장벽 제거 장치</b>로 작동. "떨어져도 5만원 내고 참여하겠다"는 응답도 있어 <b>유료 전환 가능성 시그널</b> 확인.</p>
+
+    <p class="q">Q15. 내년 희망 멘토 <span class="score">유효 105건</span></p>
+    <p>IT·AI·개발 20 · 제조·엔지니어(반도체·로봇·방산) 20 · 유통·커머스·MD·식품 12 · HR 11 · 네임드 스타트업(토스·당근·컬리 등) 6 · 금융·회계 5 · 건설 등 기타</p>
+    <p class="ins">현재 멘토 풀이 HR·커머스에 기울어 있다면 <b>IT/개발과 제조 엔지니어 계열이 최대 공급 부족 영역</b>. 특히 "토스" 반복 언급(4회) — 네임드 테크기업 멘토 1~2명의 상징적 효과가 클 것.</p>
+
+    <p class="q">Q16. 개선 요청 <span class="score">유효 62건</span></p>
+    <p>감사·긍정 22 / 매칭·직무연관 아쉬움 12 / 그룹 운영(인원 과다·가이드 부재·진행 중재) 11 / 사전 커뮤니케이션(신청 확인 문자·멘토 사전 공지·질문지) 8</p>
+    <p class="ins">불만 3대 축이 명확 — ①매칭 ②그룹 운영 표준화("멘토 개인 능력에 의존") ③사전 안내 부재. <b>셋 다 비용이 아니라 오퍼레이션 설계로 해결 가능</b>.</p>
+
+    <h2><span class="num">2</span>Executive Summary</h2>
+    <div class="exec">
+      행사는 성공했습니다(만족 4.55, 추천 4.64, 멘토 만족 4.62). 가치의 원천은 압도적으로 그룹 멘토링(76.9%)이며, 참가자 70%가 1:1 멘토링 잠재 수요로 전환됐습니다. <b>단 하나의 구조적 약점은 조 매칭(4.02)</b> — 매칭 품질이 전체 만족도를 결정하는 단일 변수(상관 0.567)이고, 응답자 13%가 사실상 매칭 실패를 경험했습니다. 멘토 품질이 아니라 <b>매칭 알고리즘·그룹 운영 가이드·사전 커뮤니케이션이라는 운영 설계의 문제</b>이므로, 다음 회차에서 가장 적은 비용으로 가장 큰 만족도 상승을 만들 수 있는 지점입니다. 동시에 1:1 전환(85명 풀), 장학 트랙(33명), 멘토 지명 데이터라는 <b>세 개의 후속 비즈니스 자산</b>이 이번 설문으로 확보됐습니다.
+    </div>
+
+    <h2><span class="num">3</span>즉시 액션 (행사 후 후속)</h2>
+    <ol>
+      <li><b>72시간 내 1:1 팔로업 분리 발송</b> — "네" 38명에겐 매칭 절차 안내, "고민 중" 47명에겐 멘토 프로필+후기(Q10 인용)로 전환 유도. 장학 관심 33명은 별도 심사 안내.</li>
+      <li><b>멘토 지명 데이터 공유</b> — 윤의성·문희철·전미희·이주호 등 지명 멘토에게 결과 피드백 → 차기 참여 락인.</li>
+      <li><b>Q10의 119개 조언을 콘텐츠화</b> — 카드뉴스·릴스 소재로 즉시 재활용.</li>
+      <li><b>매칭 실패 16명 개별 케어</b> — 사과 + 희망 분야 1:1 우선 매칭 제안. 디트랙터를 프로모터로 전환하는 가장 싼 방법.</li>
+    </ol>
+
+    <h2><span class="num">4</span>다음 행사 개선 액션</h2>
+    <ol>
+      <li><b>매칭 프로세스 재설계</b>: 신청 시 산업×직무×연차 3축 수집 → 1·2순위 보장 원칙 → 배정 결과 사전 공지(이의 신청 창구 포함).</li>
+      <li><b>그룹 멘토링 운영 표준화</b>: 멘토용 퍼실리테이션 가이드(자기소개 생략, 1인 1질문 보장, 독점 발언 중재 룰), 조당 인원 상한 축소, 멘토에게 멘티 프로필·질문지 사전 전달.</li>
+      <li><b>사전 커뮤니케이션 3종 자동화</b>: 신청 확인 문자 → 행사 D-1 리마인드 → 멘토·조 배정 공지.</li>
+      <li><b>프로그램 구조 조정</b>: 2부 시간 확대, 3부 네트워킹은 "동일 직무끼리 연락처 교환" 같은 목적형 포맷으로 전환 또는 축소.</li>
+      <li><b>멘토 풀 확충 우선순위</b>: IT/개발(토스 등 네임드 포함) &gt; 제조 엔지니어(반도체·로봇·방산) &gt; 건설 순.</li>
+    </ol>
+
+    <h2><span class="num">5</span>다음 행사 가설 & 아이디어</h2>
+    <p class="sub-h">검증할 가설</p>
+    <ol>
+      <li><span class="hlabel">H1</span>조 매칭 만족(Q8)을 4.0→4.5로 올리면 전체 만족도가 4.55→4.75+로 상승한다 (상관 0.567 기반).</li>
+      <li><span class="hlabel">H2</span>사전 질문지 제출 조는 미제출 조 대비 멘토 만족(Q7)이 유의하게 높다.</li>
+      <li><span class="hlabel">H3</span>"고민 중" 응답자에게 72시간 내 개인화 팔로업 시 전환율 30%+ 달성 가능.</li>
+      <li><span class="hlabel">H4</span>조 내 연차 밴드를 좁히면(±2년) 매칭 점수가 상승한다 — 이번엔 산업·직무만 맞추고 연차를 무시한 것이 저점의 숨은 원인.</li>
+      <li><span class="hlabel">H5</span>참가자 추천 코드 도입 시 차기 모집의 20%+를 오가닉 추천으로 채울 수 있다 (추천 의향 4.64 기반).</li>
+    </ol>
+    <p class="sub-h">아이디어</p>
+    <ol>
+      <li>조 편성을 "산업"이 아닌 <b>"고민 유형"(취준/이직/방향설정/창업) 우선</b>으로 짜는 A/B 테스트 — Q12 분포가 이를 지지.</li>
+      <li>멘토 지명 수를 KPI로 한 <b>"멘토 리그"</b> 운영 → 차기 라인업 자연 선별.</li>
+      <li>참가자를 운영 서포터즈로 흡수해 <b>커뮤니티화</b> — "내부 인재추천제·프로젝트 같이 만들자"는 참가자 제안 반영.</li>
+      <li>장학 트랙 낙선자 대상 <b>유료(5만원) 옵션</b> 오픈 — 이미 지불 의사 시그널 존재.</li>
+    </ol>
+  </div>
+  </div><!-- /panel-report -->
+
+  <div class="foot">멘토 매칭은 실명 지명(설문 Q13) 우선, 그 외 분야·키워드 기반 추천안입니다 · 확정 전 멘토 일정 확인 필요<br>데이터 기준: 2026.07.04 설문 응답 121건 · 작성: Willog People Team</div>
+</div>
+
+<script>
+const APPLICANTS = [{"name": "안상훈", "phone": "010-2613-5351", "email": "tbvjvsladla@naver.com", "status": "확정", "field": "취업 전략", "topic": "자소서 첨삭+추천 스타트업", "scholarship": "", "mentor": "김준수", "match_type": "추천"}, {"name": "박지영", "phone": "010-5606-3611", "email": "ginajiyoung@gmail.com", "status": "확정", "field": "리더십·조직", "topic": "공부하고 있는 분야를 실무에 적용", "scholarship": "", "mentor": "백종화", "match_type": "추천"}, {"name": "김예원", "phone": "010-2714-1852", "email": "joycekim03@naver.com", "status": "고민 중", "field": "취업 전략", "topic": "대학생 3학년인데 대기업 취업 전략을 자세하게 배우고 싶습니다", "scholarship": "관심", "mentor": "이대욱", "match_type": "추천"}, {"name": "김준수", "phone": "010-6540-1672", "email": "shurinke@gmail.com", "status": "고민 중", "field": "취업 전략", "topic": "", "scholarship": "", "mentor": "우태욱", "match_type": "추천"}, {"name": "서광우", "phone": "010-4337-4514", "email": "gunship935@gmail.com", "status": "고민 중", "field": "취업 전략", "topic": "ai와 개발자에 대한 방향성과 포트폴리오와 면접전략", "scholarship": "관심", "mentor": "문희철", "match_type": "추천"}, {"name": "이연우", "phone": "010-4155-6245", "email": "yeon230911@gmail.com", "status": "확정", "field": "리더십·조직", "topic": "조직 내 강점 발현,융합", "scholarship": "관심", "mentor": "백종화", "match_type": "추천"}, {"name": "김동형", "phone": "010-4941-1918", "email": "ehdgud0827@naver.com", "status": "고민 중", "field": "취업 전략", "topic": "직무와 산업전환으로 취업 전략 도움을 받고싶습니다", "scholarship": "관심", "mentor": "박형재", "match_type": "추천"}, {"name": "전은하", "phone": "010-2561-3708", "email": "eunhaj02@gmail.com", "status": "확정", "field": "취업 전략", "topic": "김준수님 - 기업 규모별 및 유형별로 정확히 알 수 있었습니다", "scholarship": "", "mentor": "김준수", "match_type": "지명"}, {"name": "오상민", "phone": "010-2964-0355", "email": "mintemonte55@gmail.com", "status": "고민 중", "field": "취업 전략", "topic": "괜찮습니다.", "scholarship": "", "mentor": "이대욱", "match_type": "추천"}, {"name": "구광혁", "phone": "010-5890-4060", "email": "wgrhkdgur@naver.com", "status": "확정", "field": "취업 전략", "topic": "저의 엔지니어적 경험들을 바탕으로 어느 것을 강점으로 내세울 수 있을지, 그리고 나이가 많은 약점이 있는데 취업 전략 계획 시 어떤 전략으로 가야할지", "scholarship": "관심", "mentor": "문희철", "match_type": "추천"}, {"name": "배서윤", "phone": "010-3545-1607", "email": "qotjdbs1130@gmail.com", "status": "고민 중", "field": "특정 산업 이해", "topic": "제조(로봇,장비)", "scholarship": "", "mentor": "김준수", "match_type": "추천"}, {"name": "조수경", "phone": "010-8109-5646", "email": "josukyeongb17@gmail.com", "status": "확정", "field": "커리어 방향", "topic": "앞으로 어떻게 커리어 방향을 설정할지 고민입니다. 영업관리, 물류 업무 직무수행중입니다\n창업에 대한 조언을 받고 싶어요", "scholarship": "", "mentor": "김대일", "match_type": "추천"}, {"name": "남한현", "phone": "010-4228-6315", "email": "skagksgus12@naver.com", "status": "확정", "field": "취업 전략", "topic": "직장 다니다가 공무원 시험 준비 후 혹여나 잘 안된다면 어떻게 처음부터 다시 어떤 분야와 직무를 설정 해야 할지 막막합니다..", "scholarship": "관심", "mentor": "우태욱", "match_type": "추천"}, {"name": "조은강", "phone": "010-3270-6952", "email": "engang@naver.com", "status": "확정", "field": "취업 전략", "topic": "교육 컨설팅에서 인하우스 HRD로 이직을 시도하고 있습니다. 저의 경험들이 어느 정도로 경쟁력이 있는지, 가지고 있는 경험을 최대한 잘 어필하기 위해 어떤 관점에서 다시 바라보고, 또 서류를 개선할 수 있을지, 추가로 발굴할 경험의 포인트가 있을지를 피드백 받아보고 싶", "scholarship": "", "mentor": "윤의성", "match_type": "추천"}, {"name": "고수연", "phone": "010-4760-6156", "email": "rhtndus0623@naver.com", "status": "고민 중", "field": "취업 전략", "topic": "전미희 멘토님-패션 뷰티 이커머스 등 다양한 직무와 산업을 경험하셔서 제 이력의 경쟁성과 지금 당장 준비해야하는 것이 무엇인지 궁금합니다!", "scholarship": "관심", "mentor": "전미희", "match_type": "지명"}, {"name": "이효진", "phone": "010-4807-9498", "email": "sungsung0101@naver.com", "status": "고민 중", "field": "취업 전략", "topic": "우준호 대표님", "scholarship": "", "mentor": "박형재", "match_type": "추천"}, {"name": "배한수", "phone": "010-2669-0213", "email": "hsue123@naver.com", "status": "확정", "field": "커리어 방향", "topic": "회사를 선택할때 어떤 점을 고려해야 다음 커리어에 효과적으로 다가갈수 있을지에 대해 고민입니다.\n\n스스로 지원기업들에 순위를 써내려가고있지만 잘못된 방법이라면 너무 후회될 것 같기 때문입니다.", "scholarship": "", "mentor": "우태욱", "match_type": "추천"}, {"name": "이현서", "phone": "010-4693-7987", "email": "lhs030103@naver.com", "status": "고민 중", "field": "취업 전략", "topic": "우송수 멘토님\n토스 페이먼트나 토스 뱅크 취업을 위해 어떤 걸 준비해야 하는지", "scholarship": "관심", "mentor": "우송수", "match_type": "지명"}, {"name": "주슬기", "phone": "010-8524-0956", "email": "jsg930105@gmail.com", "status": "고민 중", "field": "커리어 방향", "topic": "복석호 멘토님이요! 저희조 멘토님이셨는데 저랑 성향이 비슷하시고 hr전반을 다 경험하시고 들려주신 얘기들이 굉장히 와닿았어요. 그래서 제 커리어를 두고 의논드려보고 싶어요!", "scholarship": "", "mentor": "복석호", "match_type": "지명"}, {"name": "조윤지", "phone": "010-6496-2778", "email": "yesj369@naver.com", "status": "고민 중", "field": "취업 전략", "topic": "", "scholarship": "관심", "mentor": "이대욱", "match_type": "추천"}, {"name": "김민재", "phone": "010-8287-0687", "email": "ryoul097@naver.com", "status": "고민 중", "field": "커리어 방향", "topic": "백종화 대표님, 박형재 대표님", "scholarship": "", "mentor": "백종화", "match_type": "지명"}, {"name": "고다영", "phone": "010-3345-5446", "email": "kodayoung1@gmail.com", "status": "고민 중", "field": "취업 전략", "topic": "현재 내 커리어에 대한 객관적인 평가, 현재 상황에 대한 산업적 판단, 앞으로 커리어 준비", "scholarship": "", "mentor": "박형재", "match_type": "추천"}, {"name": "박유성", "phone": "010-9324-2976", "email": "bak.yu.seong@gmail.com", "status": "확정", "field": "취업 전략", "topic": "윤의성 멘토님과 멘토링을 희망합니다. 어떤 경험을 해야 인사전문가로서 성장하고, 나아가 글로벌 인사까지 할 수 있을지 알고 싶습니다.", "scholarship": "관심", "mentor": "윤의성", "match_type": "지명"}, {"name": "이명로", "phone": "010-6573-2010", "email": "lag159@naver.com", "status": "확정", "field": "커리어 방향", "topic": "김상미 멘토님, IR 팀에서 자산운용사로 커리어 전환 관련 고민이 있습니다.\n\n금일 행사에서 직접 멘토링을 받지는 않았지만 희망하는 분야에 재직중이신 멘토님이셔서 신청하게 되었습니다.", "scholarship": "", "mentor": "김상미", "match_type": "지명"}, {"name": "조승아", "phone": "010-4156-3513", "email": "sdunge222@gmail.com", "status": "고민 중", "field": "커리어 방향", "topic": "커리어 방향성과 취업 포폴 및 이력서를 컨펌받고 싶습니다.", "scholarship": "관심", "mentor": "우태욱", "match_type": "추천"}, {"name": "하건주", "phone": "010-9839-1563", "email": "gjhav8@knu.ac.kr", "status": "고민 중", "field": "커리어 방향", "topic": "대학교 4학년 때부터 금융공기업 취업 준비만 5년, 외국계 기업 영업관리 6개월, 현재 사회복지학 석사과정, HR Coordinator나 ESG연구원, 초선 국회의원 비서관•보좌관을 권유받고 있음.\n\nHR 외길만 걷고 싶으며, 전문가를 향해 도약하고 싶음.", "scholarship": "관심", "mentor": "황경하", "match_type": "추천"}, {"name": "유슬비", "phone": "010-9464-2357", "email": "ysb5237388@naver.com", "status": "확정", "field": "리더십·조직", "topic": "전문가, 프로는 어떤의미일까요? 다들 규정하는게 다른거 같아요", "scholarship": "관심", "mentor": "복석호", "match_type": "추천"}, {"name": "최수정", "phone": "010-8331-0614", "email": "studioborder@naver.com", "status": "고민 중", "field": "커리어 방향", "topic": "패션 뷰티 산업에서의 경력직 포지션.  '시장의 프레임과 제가 추구하는 CD(크리에이티브 디렉터) 롤 사이의 간극을 어떻게 좁힐 것인가‘. 멘토님께서 답변을 주시긴 했지만 한번 더 적었습니다.", "scholarship": "", "mentor": "이주호", "match_type": "추천"}, {"name": "최동현", "phone": "010-4722-8764", "email": "cdy8769@naver.com", "status": "고민 중", "field": "취업 전략", "topic": "경험이 부족한데 식품산업에서 상품기획과 마케팅 관련 경험을 쌓으려면 어떤 전략을 쌓고 해나가야할지 궁금합니다", "scholarship": "", "mentor": "전미희", "match_type": "추천"}, {"name": "김고은", "phone": "010-8284-1989", "email": "yms06177@naver.com", "status": "확정", "field": "취업 전략", "topic": "현재 식품유통 업계 영업기획 주니어 레벨입니다. 직무가 안맞진않지만 자신있는 분야는 아니며 조직문화 문제로 이직 고민 중입니다. 동종 업계 및 영업기획 직무에 멘토링을 해주실 멘토님과 매칭되었으면 좋겠습니다.", "scholarship": "", "mentor": "황경하", "match_type": "추천"}, {"name": "정은영", "phone": "010-6752-5420", "email": "redjenny9@naver.com", "status": "확정", "field": "특정 산업 이해", "topic": "제조업 산업에 대한 이해가 거의 없는 편이라 관련해서 HR직무로서 근로자의 특성이나 고려해야할 부분이 저와 맞을지, 그리고 어떻게 산업의 이해를 키워나갈수 있을지 멘토링 받고 싶습니다.", "scholarship": "", "mentor": "윤의성", "match_type": "추천"}, {"name": "유상명", "phone": "010-8794-5221", "email": "wjswls0009@naver.com", "status": "고민 중", "field": "취업 전략", "topic": "다시 재취직을 하려고하는데 서류에서 많은 탈락을해서 이유를 알고싶습니다.", "scholarship": "", "mentor": "김준수", "match_type": "추천"}, {"name": "주영준", "phone": "010-8408-1282", "email": "yeong9701@gmail.com", "status": "고민 중", "field": "취업 전략", "topic": "인프라엔지니어 다양하게 플랫폼 엔지니어, 클라우드엔지니어, devops 등으로 많지만 신입 티오가 적고 신입이 하기 힘든 직무인데 해당 직무를 조금 튼다면 어떤 직무를 준비하고 어떻게 준비를 해야할 지 시작은 컨테이너 기술의 재미로 시작했었는데 살릴 수 있을지 그리고 ", "scholarship": "", "mentor": "문희철", "match_type": "추천"}, {"name": "황도영", "phone": "010-5614-1970", "email": "hdvsann@gmail.com", "status": "확정", "field": "창업·사업", "topic": "김대일 패스트파이브 대표님,\n\n하고자 하는 창업 도메인이 패스트파이브에서 진행하고 있는 패스트캠퍼스 도메인과 가닿아있어 멘토링 신청하고 싶습니다. ", "scholarship": "", "mentor": "김대일", "match_type": "지명"}, {"name": "김민규", "phone": "010-6297-6426", "email": "kmg1242@naver.com", "status": "고민 중", "field": "커리어 방향", "topic": "문희철 멘토님/ 아직 고민에 대한 주제는 정리할 시간이 필요할 것 같습니다.", "scholarship": "", "mentor": "문희철", "match_type": "지명"}, {"name": "서진영", "phone": "010-2737-9778", "email": "azurine_mist@naver.com", "status": "고민 중", "field": "취업 전략", "topic": "올해 졸업한 쌩신입이라 뷰티 쪽에 핏하게 맞는 경험들이 없습니다.\n그래도 학회장 수익활동, 인턴 경험으로 브랜드 분석 및 유치, 방송국 인턴경험 등이 있는데 서류에서 떨어지니 어떻게 전략을 짜야할지 고민돼요.", "scholarship": "관심", "mentor": "이주호", "match_type": "추천"}, {"name": "김주은", "phone": "010-8821-6916", "email": "jueun.k926@gmail.com", "status": "고민 중", "field": "취업 전략", "topic": "지방사립대 4년제 국제학과 졸업 이후 디지털 퍼포먼스 광고대행사에서 1년 6개월 근무 후 퇴사한 지 2개월이 지난 시점입니다.\n광고대행업이 아니라 소비재 회사 또는 앱서비스 회사에서의 회사 사업 전반에 영향을 줄 수 있는 마케터로의 재취업에 욕심이 있습니다.\n기획, 마", "scholarship": "관심", "mentor": "문희철", "match_type": "추천"}, {"name": "조민지", "phone": "010-2503-4096", "email": "whakswl33@naver.com", "status": "고민 중", "field": "커리어 방향", "topic": "상품기획 직무 맨토님 / 현재 경험이 상품 기획 직무와 매칭 하는지, 앞으로의 커리어를 위해 어떤 업무를 더 해보는 것이 좋을지 ", "scholarship": "", "mentor": "전미희", "match_type": "추천"}, {"name": "정진실", "phone": "010-9004-6030", "email": "whdxmfn@gmail.com", "status": "고민 중", "field": "커리어 방향", "topic": "잘 하고있는건지 어느시점까지 최선을 다해야하는건지 기준을 잡기에 내가 올바른 가치관과 태도를\n가지고있는지가 고민입니다", "scholarship": "", "mentor": "박형재", "match_type": "추천"}, {"name": "정원", "phone": "010-3831-9403", "email": "jleocdo@gmail.com", "status": "고민 중", "field": "취업 전략", "topic": "윤의성 멘토님 \n\n현재 제가 가진 강점과 상황을 기반으로 취업 전략 및 다년간의 경험이 있으신 현직 HR분의 피드백을 듣고 이야기 나누는 것이 앞으로의 저의 미래 커리어에 큰 도움이 될 것 같습니다. 감사합니다.", "scholarship": "", "mentor": "윤의성", "match_type": "지명"}, {"name": "진민정", "phone": "010-9766-5471", "email": "adswlsalswjd1015@gmail.com", "status": "고민 중", "field": "취업 전략", "topic": "서류합격방법(회사가 어떤 사업을 하고 있는지 어느 부분이 강한지 자료 찾고 자기소개서 적는데 어려움을 겪는 것 같고 내용들이 딱 와닿지가 않아 면접때도 여러움울 겪을 것 같음 또 스피치 능력이 떨어지는 것 같아서 말하는 법도 배우고 싶어요)", "scholarship": "", "mentor": "김대일", "match_type": "추천"}, {"name": "최성은", "phone": "010-9519-5116", "email": "guswp30515@gmail.com", "status": "확정", "field": "취업 전략", "topic": "온라인md 나 bm을 희망하고 있는데 포트폴리오 피드백과 제 경험이 얼마나 강점이 되는지, 어떻게 취업 전략을 짜면 좋을지 고민이 됩니다. 신입공채 지원하고 싶은데 공채과정이 너무 힘들다 보니 고민도되고 신입으로 나이가 많다보니 작은 기업에라도 가서 경험을 쌓아야할 것", "scholarship": "관심", "mentor": "문희철", "match_type": "추천"}, {"name": "김도희", "phone": "010-4137-2042", "email": "dhdh2040@naver.com", "status": "확정", "field": "취업 전략", "topic": "IT 기업 기획 직무 취업 과정에서 아직 시장이 원하는 사람이 아닌 듯 해 경쟁력을 갖추기 위한 고민을 하고 있습니다. 오늘 멘토링에서 채널톡 멘토님과 이야기를 하며 어느정도 해소가 되었지만 제 경험 중심으로 더 디테일한 이야기를 나누고 싶습니다!", "scholarship": "관심", "mentor": "문희철", "match_type": "추천"}, {"name": "김건우", "phone": "010-3249-4946", "email": "sowhat443@gmail.com", "status": "확정", "field": "커리어 방향", "topic": "문희철 리드님, PM의 커리어 확장 방향에 대한 고민이 있습니다.", "scholarship": "", "mentor": "문희철", "match_type": "지명"}, {"name": "김지희", "phone": "010-5660-3297", "email": "kimjihui45@gmail.com", "status": "확정", "field": "취업 전략", "topic": "멘토님 일정으로 몇 주 전에 만나 뵙었습니다. 이력서 위주로 봐주셨어요.", "scholarship": "", "mentor": "이대욱", "match_type": "추천"}, {"name": "이유진", "phone": "010-7902-2930", "email": "ercw486@gmail.com", "status": "고민 중", "field": "리더십·조직", "topic": "문희철 멘토님, 전준수 대표님 통해 사전 신청드렸었는데 혹시 특이사항 있으시면 연락 부탁드립니다:)", "scholarship": "관심", "mentor": "문희철", "match_type": "지명"}, {"name": "안송이", "phone": "010-5126-3190", "email": "wowls960643@gmail.com", "status": "고민 중", "field": "리더십·조직", "topic": "리더십 성장을 위한 커리어 방향 설정", "scholarship": "", "mentor": "백종화", "match_type": "추천"}, {"name": "남은아", "phone": "010-9057-9973", "email": "dmsdk9973@naver.com", "status": "고민 중", "field": "커리어 방향", "topic": "현재 중소기업에서 인사총무 일을 하고 있는데 인사일은 없고 총무일만 있습니다 이마저도 업무가 많이 없어서 이직을 하고 싶은데 일이 없는 상황에서 어떻게 성과를 내서 이직을 할 수 있을지 고민이고 결혼과 출산을 하고 싶은데 커리어를 포기하고 육아를 전념해야 할지가 고민이", "scholarship": "", "mentor": "복석호", "match_type": "추천"}, {"name": "이준용", "phone": "010-4041-5144", "email": "junyong990927@gmail.com", "status": "고민 중", "field": "취업 전략", "topic": "관심분야에서 좋안 인재인지 확인 및 어떤 것을 아필하면 좋을지", "scholarship": "", "mentor": "김준수", "match_type": "추천"}, {"name": "문세린", "phone": "010-7208-4526", "email": "selynn.m@gmail.com", "status": "고민 중", "field": "직무 전환", "topic": "홍보경력이 있는데 홍보업무가 점점 좁아지는 추세라 직무 변경이 필요하다 생각합니다. 멘토님께서 b2b 또는 대관 업무를 추천하셨는데 전혀 생각도 못했던 직무라 어떻게 접근해야하는지 새로운 고민이 생겼습니다.", "scholarship": "관심", "mentor": "박형재", "match_type": "추천"}, {"name": "강승현", "phone": "010-8812-6406", "email": "applecloud11@naver.com", "status": "고민 중", "field": "커리어 방향", "topic": " 잘모르겠습니다.", "scholarship": "", "mentor": "우태욱", "match_type": "추천"}, {"name": "김정의", "phone": "010-2294-5229", "email": "jeongui9817@gmail.com", "status": "확정", "field": "커리어 방향", "topic": "문희철님, IT B2B에서의 PM역할과 시장성, 필요한 능력이 궁금합니다", "scholarship": "", "mentor": "문희철", "match_type": "지명"}, {"name": "남요셉", "phone": "010-5490-2760", "email": "yosebnam@gmail.com", "status": "고민 중", "field": "취업 전략", "topic": "이력서와 면접 취업 방향성", "scholarship": "관심", "mentor": "이대욱", "match_type": "추천"}, {"name": "김태인", "phone": "010-8048-4562", "email": "zero0164@naver.com", "status": "고민 중", "field": "취업 전략", "topic": "AI 엔지니어 직무를 희망하고 로봇 산업으로 가고 싶은데 제가 가진 경험이 경쟁력이 있을지 모르겠습니다.", "scholarship": "", "mentor": "문희철", "match_type": "추천"}, {"name": "이정엽", "phone": "010-3168-9272", "email": "wjdduq0719@naver.com", "status": "확정", "field": "취업 전략", "topic": "현재 제가 가지고 있는 경험을 바탕으로 자기소개서를 작성할때 기존에 가지고 있는 작성본은 제 경험이 잘 녹여져 있는지..? AI시대로 전환되고 있는 지금 자바 백엔드 개발자는 어떤 역량을 가지고 있어야하는지..? 저는 그런 역량이 있는지..? 포트폴리오 구성은 잘 되어", "scholarship": "", "mentor": "문희철", "match_type": "추천"}, {"name": "최주은", "phone": "010-7167-9206", "email": "dkms9206@naver.com", "status": "고민 중", "field": "취업 전략", "topic": "황경하 멘토님", "scholarship": "관심", "mentor": "황경하", "match_type": "지명"}, {"name": "김도윤", "phone": "010-8557-7443", "email": "predicable@naver.com", "status": "확정", "field": "취업 전략", "topic": "보유 경험의 유효성, 자소서에는 경험을 물어봐놓고 면접때는 그경험은 필요없는데요 라고 이야기하는경우, 직무능력이 부족하다고 생각하는데 높은 직급을 제안받았을때", "scholarship": "", "mentor": "김준수", "match_type": "추천"}, {"name": "전해성", "phone": "010-6689-3553", "email": "zxcoc1245@naver.com", "status": "고민 중", "field": "리더십·조직", "topic": "5년차입니다. 이직을 원했는데 스스로 잘 하지 않게 되기도 하고, 지금 있는 회사에서부터 잘해야겠다는 생각에 현 업에 집중을 하고 있습니다. 사내정치와 제대로 일하지않고 일을 던지기만 하는 매니저 아래에서 많은 업무를 해내야 하는 책임감을 요구받고 있는데, 업무들의 딜", "scholarship": "", "mentor": "복석호", "match_type": "추천"}, {"name": "오태웅", "phone": "010-9451-5201", "email": "dhxodnd7799@naver.com", "status": "고민 중", "field": "커리어 방향", "topic": "고민중이라서 당장 드릴 답변이 아닙니다.", "scholarship": "관심", "mentor": "우태욱", "match_type": "추천"}, {"name": "이수하", "phone": "010-5318-9518", "email": "geat04@naver.com", "status": "고민 중", "field": "취업 전략", "topic": "1년 4개월 + 6개월 = 종합 2년 정도의 연차를 갖고 있으나, 경력이라고 하기엔 전문성이나 업무 이해도가 턱없이 부족한 것 같습니다. 물론 중고신입을 노리고 있으나 과연 제가 경쟁력이 있는 사람인지는 잘 모르겠고 저의 경험에 자신이 없습니다😂 어떻게 하면 저의 경험", "scholarship": "", "mentor": "이대욱", "match_type": "추천"}, {"name": "신용탁", "phone": "010-2201-7749", "email": "dydxkr927@naver.com", "status": "고민 중", "field": "취업 전략", "topic": "상장사 제조업 회계팀을 목표로 취업중입니다. 회사 관련하여 사업보고서를 읽으며 면접을 준비중인데 면접경험이 전무하여 사업보고서중 어떤 계정과목들에 비중을 두고 덜어야하는지, 회사 채용 홈페이지에서 이거만큼은 중요하다고 생각하시는 부분은 무엇인지 인사담당자님 입장이 궁금", "scholarship": "관심", "mentor": "황경하", "match_type": "추천"}, {"name": "최희원", "phone": "0163716842", "email": "gldjsldjs@naver.com", "status": "확정", "field": "취업 전략", "topic": "컬리 뷰티에서 일하시는 멘토분과 하고 싶습니다. 제가 제1희망이 오프라인(백화점,쇼핑몰) 유통 MD이고, 제 2희망으로 온라인MD를 지원하려고 합니다. 3년정도 고시 준비를 했고, 대학원도 나와서 신입으로 나이가 많습니다. 그래서 amd 인턴 뽑히기가 어렵고, 어떻게 ", "scholarship": "", "mentor": "이주호", "match_type": "추천"}, {"name": "국가희", "phone": "010-2747-4815", "email": "kukgahee@naver.com", "status": "고민 중", "field": "커리어 방향", "topic": "전자및정보공학 전공으로 석사 졸업을 한 상황에서 미 완성된 제품에서 펌웨어 소프트웨어를 구성해보지 않고, 센서 신호처리를 기반으로 한 소프트웨어 경험이 대부분인 상황에서 더 교육을 배우는 것에 대해 두려움이 있습니다. 우선 지금 가진 경험을 어떻게 산업과 임베디드로 연", "scholarship": "", "mentor": "문희철", "match_type": "추천"}, {"name": "강남규", "phone": "010-5584-6816", "email": "kangnamgue@naver.com", "status": "확정", "field": "리더십·조직", "topic": "박선주 이사님 ", "scholarship": "", "mentor": "박선주", "match_type": "지명"}, {"name": "손보민", "phone": "010-2378-6887", "email": "bomins0429@gmail.com", "status": "확정", "field": "취업 전략", "topic": "5년 회계, 4년 내부회계로 총 9년4개월 회계경력을 가지고있고, 25년2월에 개발을 할줄아는 회계인이 되고싶어 퇴사를 한후 1년정도 창업을 도전하다가 재취업준비한지 6개월정도 되었습니다. 현재까지 이력서를 50군데 넣어 1차면접 10곳을 떨어졌는데, 경력단절이 되는거", "scholarship": "관심", "mentor": "문희철", "match_type": "추천"}, {"name": "김예지", "phone": "010-5096-1291", "email": "aszx1291@naver.com", "status": "확정", "field": "기타/미정", "topic": "이차전지 장비업에서 프로젝트매니저로 근무하였습니다. 첫 회사 1년4개월 두 번째 2년2개월 입니다.\n권고사직으로 1년 반가량 구직중입니다.\n작년에는 서류되고 면접도 4번 봤는데도 최종 불합이였습니다.\n그 후, 이번년 취준에서 서류가 되지않고 있는 문제가 있어 무엇이 문", "scholarship": "", "mentor": "운영진 확인 필요", "match_type": "추천"}, {"name": "송재민", "phone": "010-8713-7567", "email": "crashing9766@gmail.com", "status": "확정", "field": "창업·사업", "topic": "현재 F&B분야에서 창업활동을 이어가는 중이지만, 조직에서의 성장 경험을 충분히 가지며 배우고자 취업을 염두에 두고 있습니다. 관련해서 궁금한 점을 여쭙고 싶습니다.", "scholarship": "관심", "mentor": "전미희", "match_type": "추천"}, {"name": "조영수", "phone": "010-2365-4724", "email": "kindjo1020@naver.com", "status": "확정", "field": "직무 전환", "topic": "HRB로 이직을 신청합니다. 언어치료사로 3년을 살아왔기에 전공도 경력도 너무 달라서 어떻게 새로운 도전에 시작할 수 있을지 그리고 실제 어떤곳을 추천하시고 어떻게 들어갈수있을지 도움받기 원합니다", "scholarship": "관심", "mentor": "윤의성", "match_type": "추천"}, {"name": "강민수", "phone": "010-4184-3165", "email": "kms970926@naver.com", "status": "확정", "field": "취업 전략", "topic": "방산 사업관리/pm/국내사업", "scholarship": "", "mentor": "문희철", "match_type": "추천"}, {"name": "지승현", "phone": "010-7303-0925", "email": "powerjsh99@gmail.com", "status": "확정", "field": "취업 전략", "topic": "막 전역한 경영학과 장교입니다. 쌓아놨던 경험이나 경력을 사회에서도 사용할 수 있도록 전환하고 싶고, 이외의 필요한 경험들을 쌓고 싶은데 방향을 정하지 못하겠습니다. 제가 가진 잠재력을 어느 분야에서 발휘해야하며 이에 필요한 노력은 무엇인지 궁금합니다.", "scholarship": "", "mentor": "박형재", "match_type": "추천"}, {"name": "조동희", "phone": "010-6707-5590", "email": "joacorn1211@gmail.com", "status": "고민 중", "field": "리더십·조직", "topic": "기존 가전이나 철강같은 규격화된 제조업체에서\n패션산업으로 이직하다보니\n직무명은 생산관리로 같은데 업무가 전혀달라 다시 제조업쪽으로 가야하는 것은 아닌지 고민이 있습니다.\n\n이런 부분과 관련하여서도 멘토링이 가능한지 여쭤보고 싶습니다.", "scholarship": "", "mentor": "이주호", "match_type": "추천"}, {"name": "권해영", "phone": "010-7635-5404", "email": "greenery1125@naver.com", "status": "확정", "field": "커리어 방향", "topic": "전미희, 이주호 / 회사내에서 사이드프로젝트를 적극적 시도하며 내 미래 창업을 준비하는 법입니다.(10년후에 2030세대가 건강하고 맛있게 마실 수 있는 TEA브랜드 기업가를 꿈꾸고 있습니다)", "scholarship": "", "mentor": "전미희", "match_type": "지명"}, {"name": "구혜인", "phone": "010-6723-9669", "email": "kuhaein42@gmail.com", "status": "확정", "field": "커리어 방향", "topic": "기획, 상품기획, 비주얼 관련 업무에 관심이 있습니다. 하지만 현재는 경영지원(총무) 직무를 수행하면서 업무 만족도와 성취감을 충분히 느끼지 못하고 있습니다.\n\n현업에서 좋은 성과를 내야 사내 이동의 기회도 얻을 수 있다는 점은 알고 있지만, 현재 업무에서 어떤 역량을", "scholarship": "관심", "mentor": "이주호", "match_type": "추천"}, {"name": "유수혁", "phone": "010-5918-7920", "email": "ewig119@naver.com", "status": "고민 중", "field": "커리어 방향", "topic": "원래 음악 (노래)를 했었고, 현실의 벽을 직시한 뒤, 1년 열심히 공부해서 중앙대 편입에 성공했고, 올해2월에 졸업한 상황입니다. 다만, 아직 직무나 산업 등 하고 싶은 분야나 방향성을 명확히 잡지 못했습니다.\n불행인지 다행인지, 제가 뭘 좋아하는지 찾고싶어서 대학생", "scholarship": "관심", "mentor": "우태욱", "match_type": "추천"}, {"name": "권은진", "phone": "010-5714-7950", "email": "dmswls7950@gmail.con", "status": "확정", "field": "커리어 방향", "topic": "박형재 대표님(P&C Partners)", "scholarship": "", "mentor": "박형재", "match_type": "지명"}, {"name": "구사랑", "phone": "010-3936-1921", "email": "joylove02@naver.com", "status": "확정", "field": "창업·사업", "topic": "에어컨 청소를 하는데 기사분들이 마케팅을 못하셔서 마케팅 대행, 오더를 드리는 플랫폼을 만들 예정입니다\n\n현업을 하시는 마케터분과 대화를 나눠서 스타트업 단계에서 마케터의 역할이나, 필요성을 여쭤보고 싶습니다", "scholarship": "", "mentor": "전미희", "match_type": "추천"}, {"name": "강혜림", "phone": "010-5003-5776", "email": "hyeriiim0@gmail.com", "status": "확정", "field": "커리어 방향", "topic": "이대욱 멘토님 혹은 우태욱 멘토님 !! \n취업과 커리어 설계 방향에 대해서 조금 더 깊게 이야기 나누고 싶습니다.\n\n현재 가장 큰 고민은 CRA(Clinical Research Associate)로 취업하기 위한 방향성과 저만의 경쟁력을 어떻게 보여줄 것인가입니다.\n\n", "scholarship": "관심", "mentor": "우태욱", "match_type": "지명"}, {"name": "최하나", "phone": "010-3903-5390", "email": "bychoco1@gmail.com", "status": "고민 중", "field": "커리어 방향", "topic": "상대적으로 느리고 수직계열화 된 산업인 헬스케어에서 성공적인 조직 생활과 커리어란 무엇인지에 대한 기준과 관점 고민.\n특히 상사가 의료진일 때, 하이라키에 대한 어려움.\n어디부터 어디까지 바운더리를 세울 것인지에 대한 세부 기준.", "scholarship": "", "mentor": "백종화", "match_type": "추천"}, {"name": "이예지", "phone": "010-4227-5684", "email": "pooyj5684@gmail.com", "status": "확정", "field": "특정 산업 이해", "topic": "백종화 멘토님께 멘토링을 받고 싶습니다.\n저는 현재 BGF리테일에서 영업관리로 5년차 재직중이며, 대학교에서 4년차 취업진로멘토로 활동중에 있습니다. 하지만 처음부터 꿈이었던 늘 심리상담/코칭에 대한 궁극적인 목표를 가지고 있습니다.\n사회직장경험과 많은 사람들을 만나보", "scholarship": "", "mentor": "백종화", "match_type": "지명"}, {"name": "권소현", "phone": "010-3598-1773", "email": "soh.kwonn@gmail.com", "status": "고민 중", "field": "커리어 방향", "topic": "할 때 행복하고 가슴 뛰는 일을 계속 찾아나서도 되는지, 현실적으로 생각해야 할지. 다음 커리어를 어떻게 선택해서 준비하면 좋을지 (직무를 더 상세하게 좁히고 싶은데, 그렇게 리소스를 들여서 달성해놓고 맞지 않거나 실패해서, 도태될 수도 있다는 불안감이 큽니다) 저는 ", "scholarship": "", "mentor": "복석호", "match_type": "추천"}, {"name": "박진혁", "phone": "010-8542-7808", "email": "jhp6413@gmail.com", "status": "확정", "field": "취업 전략", "topic": "전자전기 전공 후 반도체 산업, 공정기술 직무 취업을 희망하고 있는데 어떤 경험을 쌓아야 경쟁력이 있을지, 어떻게 그런 경험을 쌓을 수 있을지 궁금합니다.", "scholarship": "관심", "mentor": "김준수", "match_type": "추천"}, {"name": "이소희", "phone": "010-6438-4356", "email": "ablaire0306@gmail.com", "status": "고민 중", "field": "커리어 방향", "topic": "문희철 멘토님께 커리어 방향성 관련해서 멘토링을 고민중입니다", "scholarship": "", "mentor": "문희철", "match_type": "지명"}, {"name": "권지혜", "phone": "010-2987-1514", "email": "jye3748@naver.com", "status": "확정", "field": "취업 전략", "topic": "안녕하세요.\n\nHRD 및 조직문화 분야로 커리어를 확장하고 싶어 멘토링을 신청하게 되었습니다.\n\n[고민]\n\t1.\t현재까지의 경험이 이직 시 기업에서 경쟁력 있는 성과로 평가받을 수 있을지 궁금합니다.\n\t2.\t제 강점이 무엇인지 객관적인 피드백을 받고 싶습니다.\n\t3.\t", "scholarship": "", "mentor": "황경하", "match_type": "추천"}, {"name": "김주현", "phone": "010-2979-0833", "email": "jhk7491@gmail.com", "status": "고민 중", "field": "직무 전환", "topic": "항공 기내식 제조업에서 생산관리 3년 차로 근무하고 있습니다. 현재는 생산계획 및 관리 업무를 담당하며 고객 수요 예측을 위한 VBA, C#을 활용한 대시보드 구축 등 데이터 자동화를 통해 업무 효율을 개선하고자 관련 역량 개발하고 있습니다.\n\n동종업계가 아닌 다른 산", "scholarship": "", "mentor": "윤의성", "match_type": "추천"}, {"name": "전예원", "phone": "010-2027-4719", "email": "hello_0zz@naver.com", "status": "고민 중", "field": "커리어 방향", "topic": "이주호 멘토님, 전미희 멘토님\n\n저는 총 경력 7년 4개월이며, 이전 회사에서 이커머스 MD → 영업기획으로 약 3년, 현재 회사에서는 K-POP 아이돌 굿즈 판매를 담당하는 MD로 4년 4개월째 근무하고 있습니다.\n업무를 하면서 앨범 마케팅 분야에 관심이 생겼고, 가", "scholarship": "", "mentor": "전미희", "match_type": "지명"}];
+const INK='#16213E', AMBER='#F5B301', CORAL='#E4572E', TEAL='#2A9D8F', GRAY='#B9B2A2';
+Chart.defaults.font.family="'Pretendard Variable',Pretendard,sans-serif";
+Chart.defaults.color='#7A7568';
+
+new Chart(cScores,{type:'bar',data:{labels:['전반 만족(Q4)','추천 의향(Q5)','멘토 만족(Q7)','조 매칭(Q8)'],
+ datasets:[
+  {label:'5점',data:[80,89,85,61],backgroundColor:INK},
+  {label:'4점',data:[30,21,29,23],backgroundColor:TEAL},
+  {label:'3점',data:[9,11,4,21],backgroundColor:AMBER},
+  {label:'1~2점',data:[2,0,3,16],backgroundColor:CORAL}]},
+ options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:12}}},
+  scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,max:121,ticks:{stepSize:30}}}}});
+
+new Chart(cBest,{type:'doughnut',data:{labels:['2부 그룹 멘토링 (93)','1부 청년 콘서트·강연 (18)','1부 스토리텔링 (7)','3부 네트워킹 (3)'],
+ datasets:[{data:[93,18,7,3],backgroundColor:[INK,TEAL,AMBER,GRAY],borderWidth:2,borderColor:'#fff'}]},
+ options:{plugins:{legend:{position:'bottom',labels:{boxWidth:12}}},cutout:'58%'}});
+
+new Chart(cFields,{type:'bar',data:{labels:['취업 전략','커리어 방향','리더십·조직','창업·사업','직무 전환','특정 산업','기타'],
+ datasets:[{data:[41,26,8,3,3,3,1],backgroundColor:[INK,INK,TEAL,TEAL,TEAL,GRAY,GRAY],borderRadius:5}]},
+ options:{indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{grid:{color:'#F1EDE3'}},y:{grid:{display:false}}}}});
+
+new Chart(cNext,{type:'bar',data:{labels:['IT·AI·개발','제조·엔지니어(반도체·로봇·방산)','유통·커머스·MD·식품','HR','네임드 스타트업(토스 등)','금융·회계·VC','바이오·제약·헬스케어','뷰티·패션','건설','기타'],
+ datasets:[{data:[20,20,12,11,6,5,3,2,1,25],backgroundColor:[AMBER,AMBER,INK,INK,TEAL,TEAL,TEAL,GRAY,GRAY,'#E5DFD2'],borderRadius:5}]},
+ options:{indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{grid:{color:'#F1EDE3'}},y:{grid:{display:false},ticks:{font:{size:11}}}}}});
+
+new Chart(cImprove,{type:'bar',data:{labels:['감사·긍정','매칭·직무 연관 아쉬움','그룹 운영(인원·가이드·중재)','사전 안내·커뮤니케이션','기타'],
+ datasets:[{data:[22,12,11,8,8],backgroundColor:[TEAL,CORAL,CORAL,AMBER,GRAY],borderRadius:5}]},
+ options:{indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{grid:{color:'#F1EDE3'}},y:{grid:{display:false},ticks:{font:{size:11}}}}}});
+
+const mCount = {};
+APPLICANTS.forEach(a=>{mCount[a.mentor]=(mCount[a.mentor]||0)+1});
+const mSorted = Object.entries(mCount).sort((a,b)=>b[1]-a[1]);
+new Chart(cMentors,{type:'bar',data:{labels:mSorted.map(x=>x[0]),
+ datasets:[{data:mSorted.map(x=>x[1]),backgroundColor:mSorted.map(x=>x[1]>=10?CORAL:INK),borderRadius:5}]},
+ options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw+'명'}}},
+  scales:{x:{grid:{color:'#F1EDE3'},ticks:{stepSize:2}},y:{grid:{display:false},ticks:{font:{size:11}}}}}});
+
+// ===== 테이블 =====
+let sortKey=null, sortAsc=true;
+const $=id=>document.getElementById(id);
+const fields=[...new Set(APPLICANTS.map(a=>a.field))];
+fields.forEach(f=>fField.add(new Option(f,f)));
+[...new Set(APPLICANTS.map(a=>a.mentor))].sort().forEach(m=>fMentor.add(new Option(m,m)));
+
+function filtered(){
+  const q=fSearch.value.trim().toLowerCase();
+  let rows=APPLICANTS.filter(a=>
+    (!fField.value||a.field===fField.value)&&
+    (!fStatus.value||a.status===fStatus.value)&&
+    (!fMentor.value||a.mentor===fMentor.value)&&
+    (!fType.value||a.match_type===fType.value)&&
+    (!q||(a.name+a.email+a.topic+a.mentor).toLowerCase().includes(q)));
+  if(sortKey) rows=[...rows].sort((a,b)=>(''+a[sortKey]).localeCompare(''+b[sortKey],'ko')*(sortAsc?1:-1));
+  return rows;
+}
+function esc(s){return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function render(){
+  const rows=filtered();
+  cnt.textContent=`${rows.length}명 표시 / 전체 85명 (확정 38 · 고민 중 47)`;
+  tbody.innerHTML=rows.map(a=>`<tr>
+    <td><b>${esc(a.name)}</b></td>
+    <td style="white-space:nowrap">${esc(a.phone)}<br><span style="color:#9C9585;font-size:11px">${esc(a.email)}</span></td>
+    <td><span class="pill ${a.status==='확정'?'confirm':'thinking'}">${a.status}</span></td>
+    <td style="white-space:nowrap">${esc(a.field)}</td>
+    <td class="topic">${esc(a.topic)||'<span style="color:#C4BEB0">—</span>'}</td>
+    <td>${a.scholarship?'<span class="pill schol">관심</span>':''}</td>
+    <td class="mname">${esc(a.mentor)}</td>
+    <td><span class="pill ${a.match_type==='지명'?'named':'reco'}">${a.match_type}</span></td>
+  </tr>`).join('');
+}
+document.querySelectorAll('.filters select,.filters input').forEach(el=>el.addEventListener('input',render));
+document.querySelectorAll('thead th[data-k]').forEach(th=>th.addEventListener('click',()=>{
+  const k=th.dataset.k; if(sortKey===k)sortAsc=!sortAsc; else{sortKey=k;sortAsc=true;} render();
+}));
+render();
+
+// 탭 전환
+document.querySelectorAll('.tab-btn').forEach(btn=>btn.addEventListener('click',()=>{
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('panel-dash').style.display = btn.dataset.tab==='dash'?'':'none';
+  document.getElementById('panel-report').style.display = btn.dataset.tab==='report'?'':'none';
+  window.scrollTo({top:0});
+}));
+</script>
+</body>
+</html>
